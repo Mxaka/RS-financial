@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
 
-export const Navbar = () => {
+export const Navbar = ({ onConsultClick }) => {
   const [hovered, setHovered] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
 
   const links = [
-    { id: 'networth', label: 'Overview', href: '#Networth' },
-    { id: 'makeaclaim', label: 'Make a Claim', href: '#MakeaClaim' },
-    { id: 'track', label: 'Track Claim', href: '#TrackYourClaim' },
-    { id: 'consult', label: 'Consultation', href: '#BookaConsultation' },
-    { id: 'profile', label: 'Profile', href: '#UpdateYourProfile' },
+    { id: 'networth', label: 'Overview', href: '#Networth', action: null },
+    { id: 'makeaclaim', label: 'Make a Claim', href: '#MakeaClaim', action: null },
+    { id: 'track', label: 'Track Claim', href: '#TrackYourClaim', action: null },
+    { id: 'consult', label: 'Consultation', href: '#BookaConsultation', action: onConsultClick },
+    { id: 'profile', label: 'Profile', href: '#UpdateYourProfile', action: null },
   ];
+
+  const handleLinkClick = (e, link) => {
+    if (link.action) {
+      e.preventDefault();
+      link.action();
+      setIsOpen(false);
+    } else {
+      setIsOpen(false);
+    }
+  };
 
   return (
     <>
@@ -33,6 +43,7 @@ export const Navbar = () => {
             <li key={item.id}>
               <a
                 href={item.href}
+                onClick={(e) => handleLinkClick(e, item)}
                 style={{
                   ...styles.link,
                   ...(hovered === item.id ? styles.linkHover : {}),
@@ -59,7 +70,7 @@ export const Navbar = () => {
         {isOpen && (
           <div className="mobile-menu" style={styles.mobileMenu}>
             {links.map((item) => (
-              <a key={item.id} href={item.href} style={styles.mobileLink} onClick={() => setIsOpen(false)}>
+              <a key={item.id} href={item.href} style={styles.mobileLink} onClick={(e) => handleLinkClick(e, item)}>
                 {item.label}
               </a>
             ))}
@@ -90,3 +101,5 @@ const styles = {
   mobileMenu: { position: 'absolute', top: '100%', left: 0, right: 0, background: '#0A0A0A', borderBottom: '1px solid rgba(255,107,0,0.2)', flexDirection: 'column', padding: '1rem', display: 'none', gap: '0.5rem' },
   mobileLink: { color: '#fff', textDecoration: 'none', padding: '1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }
 };
+
+export default Navbar;
