@@ -21,8 +21,11 @@
   "homepage": "https://github.com/Slindo-creator/RS-financial#readme",
   "devDependencies": {
     "@vitejs/plugin-react": "^6.1.1",
+    "autoprefixer": "^10.5.5",
+    "postcss": "^8.5.28",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "tailwindcss": "^4.3.3",
     "vite": "^8.2.2"
   }
 }
