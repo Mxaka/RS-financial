@@ -39,3 +39,7 @@
     color:white; padding:10px 16px; border-radius:10px; cursor:pointer;
 }
 .royal-badge{ background:rgba(0,0,0,0.2); padding:4px 10px; border-radius:20px; font-size:12px; }
+
+.royal-nav-link { background:none; border:none; cursor:pointer; font-size:14px; color:#64748b; }
+.royal-nav-active { background:#ff8a1a; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; }
+.royal-nav-active-orange { background:#ff8a1a; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:bold; }

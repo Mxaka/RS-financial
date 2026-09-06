@@ -82,7 +82,6 @@ export default function AdvisorDashboard() {
             <h1 style={{ margin: '8px 0 0' }}>Advisor Command Center</h1>
           </div>
           <div style={{ marginLeft: 'auto', textAlign: 'right' }}>
-            <p style={{ margin: 0 }}>Authorized Broker Panel</p>
 
           </div>
         </div>
