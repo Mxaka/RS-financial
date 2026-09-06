@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import api from '../api';
 import './RoyalTheme.css';
 
-export default function InsuranceSelector() {
+export default function InsuranceSelector({ setActiveScreen }) {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [idNumber, setIdNumber] = useState('');
@@ -38,9 +38,11 @@ export default function InsuranceSelector() {
 
     return (
         <div className="royal-root">
-            <div className="royal-nav">
-                <span>RSF Gateway Module</span> <span>Onboarding Hub</span> <span className="active">Existing Client Dashboard</span>
-            </div>
+        <div className="royal-nav">
+            <span>RSF Gateway Module</span>
+            <span onClick={() => setActiveScreen('onboarding')} style={{cursor:'pointer'}}>Onboarding Hub</span>
+            <span onClick={() => setActiveScreen('dashboard')} style={{cursor:'pointer'}} className="active">Existing Client Dashboard</span>
+        </div>
 
             <div className="royal-header">
                 <div style={{display:'flex', alignItems:'center', gap:'10px'}}>

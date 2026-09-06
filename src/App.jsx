@@ -3,6 +3,8 @@ import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import AdvisorDashboard from './Admin/AdvisorDashboard.jsx';
 import ClientDashBoard from './Client/ClientDashBoard.jsx';
 import InsuranceSelector from './Client/InsuranceSelector.jsx';
+import InvestmentForm from './Client/InvestmentForm.jsx';
+import OnboardingHub from './Client/OnboardingHub.jsx';
 import './Client/RoyalTheme.css';
 
 // Maps old screen names to real URLs, so child components can keep
@@ -60,41 +62,4 @@ export default function App() {
       </div>
     </BrowserRouter>
   );
-}
-
-// --- WRAPPER TO MAKE OLD COMPONENTS WORK WITH NAVIGATE ---
-function OnboardingWrapper() {
-    const nav = useNavigate();
-    return <OnboardingHub setActiveScreen={(s)=>{ if(s==='dashboard') nav('/dashboard'); else if(s==='investment') nav('/investment'); else if(s==='insurance') nav('/insurance'); else nav('/onboarding'); }} />;
-}
-function DashboardWrapper() {
-    const nav = useNavigate();
-    return <ClientDashBoard setActiveScreen={(s)=>nav('/'+s)} />;
-}
-function InvestmentWrapper() {
-    const nav = useNavigate();
-    return <InvestmentForm setActiveScreen={(s)=>nav('/'+s)} />;
-}
-function InsuranceWrapper() {
-    const nav = useNavigate();
-    return <InsuranceSelector setActiveScreen={(s)=>nav('/'+s)} />;
-}
-
-export default function App() {
-    return (
-        <BrowserRouter>
-            <div className="royal-root">
-                <TopNav />
-                <Routes>
-                    <Route path="/" element={<OnboardingWrapper />} />
-                    <Route path="/onboarding" element={<OnboardingWrapper />} />
-                    <Route path="/dashboard" element={<DashboardWrapper />} />
-                    <Route path="/investment" element={<InvestmentWrapper />} />
-                    <Route path="/insurance" element={<InsuranceWrapper />} />
-                    <Route path="/your-data" element={<YourDataPage />} />
-                    <Route path="/track-claim" element={<YourDataPage />} />
-                </Routes>
-            </div>
-        </BrowserRouter>
-    );
 }

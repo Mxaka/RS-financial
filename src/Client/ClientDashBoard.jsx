@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Navbar } from "../Components/Navbar";
 import Consultation from "../Components/Consultation";
-import { clientMock, claimDocumentsGuide, faqs } from "../mockData/clientData";
+import { Navbar } from "../Components/Navbar";
+import { claimDocumentsGuide, clientMock, faqs } from "../mockData/clientData";
 import { employeesMock } from "../mockData/employeeData";
 import { insightsMock } from "../mockData/insightsData";
 
@@ -37,7 +37,6 @@ const ClientDashBoard = () => {
 
       <main className="mainContent" style={styles.mainContent}>
 
-        {/* ================= OVERVIEW - REAL DASHBOARDS ================= */}
         <section id="Networth" style={styles.sectionFirst}>
           <div style={styles.headerRow}>
             <div>
@@ -47,7 +46,6 @@ const ClientDashBoard = () => {
             <div style={styles.datePill}>{new Date().toDateString()}</div>
           </div>
 
-          {/* TOP 4 STAT CARDS - REAL NUMBERS */}
           <div className="statsGrid" style={styles.statsGrid}>
             <div style={{...styles.statCard, ...styles.statOrange}}>
               <span style={styles.statLabel}>Total Net Worth</span>
@@ -71,7 +69,6 @@ const ClientDashBoard = () => {
             </div>
           </div>
 
-          {/* MIDDLE - BREAKDOWN + HISTORY */}
           <div className="overviewGrid" style={styles.overviewGrid}>
             {/* Breakdown */}
             <div style={styles.chartCard}>
@@ -90,7 +87,6 @@ const ClientDashBoard = () => {
               })}
             </div>
 
-            {/* History Chart - Pure CSS bars */}
             <div style={styles.chartCard}>
               <h3 style={styles.chartTitle}>Net Worth Growth - Last 6 Months</h3>
               <div style={styles.miniChart}>
@@ -106,7 +102,6 @@ const ClientDashBoard = () => {
             </div>
           </div>
 
-          {/* BOTTOM - SPENDING + NEXT ACTIONS */}
           <div className="bottomGrid" style={styles.bottomGrid}>
             <div style={styles.chartCard}>
               <h3 style={styles.chartTitle}>Spending Breakdown</h3>
@@ -216,7 +211,7 @@ const ClientDashBoard = () => {
 };
 
 const styles = {
-  dashboardContainer: { display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#050505', fontFamily: "'Inter', sans-serif", color: '#fff' },
+  dashboardContainer: { display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#070c1d', fontFamily: "'Inter', sans-serif", color: '#fff' },
   mainContent: { padding: '2rem', flex: 1, maxWidth: '1280px', width: '100%', margin: '0 auto', boxSizing: 'border-box' },
   sectionFirst: { marginBottom: '2rem' },
   section: { marginTop: '4rem' },

@@ -4,11 +4,16 @@ import './RoyalTheme.css';
 export default function OnboardingHub({ setActiveScreen }) {
     return (
         <div className="royal-root">
+            
             <div style={{display:'flex', gap:'10px', marginBottom:'20px'}}>
+            <h1><span style={{color:'white'}}>Royal</span> <span style={{color:'#ff8a1a'}}> Dashboard</span></h1>
+
                 <button onClick={() => setActiveScreen('onboarding')} style={{background:'#ff8a1a', color:'white', padding:'8px 14px', borderRadius:'6px', border:'none', cursor:'pointer'}}>Onboarding Hub</button>
-                <button onClick={() => setActiveScreen('dashboard')} style={{background:'white', color:'#0f172a', padding:'8px 14px', borderRadius:'6px', border:'none', cursor:'pointer'}}>Existing Client Dashboard</button>
+                <span onClick={() => setActiveScreen('dashboard')} style={{cursor:'pointer'}} className="active">Existing Client Dashboard</span>
             </div>
 
+            
+            
             <div className="royal-header">
                 <h1 style={{fontSize:'36px', fontWeight:800}}>Welcome to Your Financial Future!</h1>
                 <p style={{color:'#94a3b8', marginTop:'8px'}}>Royal Square Financial (Pty) Ltd | FSP No. 29370 - Select your path:</p>

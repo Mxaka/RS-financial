@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import api from '../api';
 import './RoyalTheme.css';
 
-export default function InvestmentForm() {
+
+export default function InvestmentForm({ setActiveScreen }){
     const [termBracket, setTermBracket] = useState('1-3');
     const [product, setProduct] = useState('Emergency Fund');
     const [monthlyAmount, setMonthlyAmount] = useState(2000);
@@ -38,7 +39,8 @@ export default function InvestmentForm() {
     return (
         <div className="royal-root">
             <div className="royal-nav">
-                <span>RSF Gateway Module</span> <span>Onboarding Hub</span> <span className="active">Existing Client Dashboard</span>
+                <span onClick={() => setActiveScreen('onboarding')} style={{cursor:'pointer'}}>Onboarding Hub</span>
+                <span onClick={() => setActiveScreen('dashboard')} style={{cursor:'pointer'}} className="active">Existing Client Dashboard</span>
             </div>
 
             <div className="royal-header">
