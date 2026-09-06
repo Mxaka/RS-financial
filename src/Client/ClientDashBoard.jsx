@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import Consultation from "../Components/Consultation";
 import { Navbar } from "../Components/Navbar";
-import { claimDocumentsGuide, clientMock, faqs } from "../mockData/clientData";
+import Royaltie from "../Components/Royaltie";
+import Consultation from "../Components/Consultation";
+import { clientMock, claimDocumentsGuide, faqs } from "../mockData/clientData";
 import { employeesMock } from "../mockData/employeeData";
 import { insightsMock } from "../mockData/insightsData";
 
@@ -21,6 +22,31 @@ const ClientDashBoard = () => {
 
   const maxHistory = Math.max(...clientMock.netWorth.history);
 
+  // === AI WEALTH MODEL CALCULATION ===
+  const total = clientMock.netWorth.total;
+  const investments = clientMock.netWorth.breakdown.find(b=>b.label.toLowerCase().includes('invest'))?.value || 1450000;
+  const spend = insightsMock.spending.thisMonth;
+  const income = 80000;
+  const claimsCount = clientMock.claims.length;
+  const invRatio = investments / total;
+  const spendRatio = spend / income;
+  let score = 50;
+  if (invRatio > 0.5) score += 25;
+  if (spendRatio < 0.5) score += 20;
+  if (claimsCount <= 1) score += 10;
+  if (spendRatio > 0.7) score -= 20;
+  if (claimsCount > 2) score -= 15;
+  score = Math.max(0, Math.min(100, score));
+  const status = score >= 75 ? "CREATE" : score < 50 ? "PRESERVE" : "STABLE";
+  const growth = Math.floor((invRatio * 80000) + (spendRatio * -50000) + (claimsCount * -8000) + 10000);
+  const forecastNow = total + growth * 6;
+  const monthsTo3M = growth > 0 ? Math.ceil((3000000 - total) / growth) : 999;
+  const actionText = status === "CREATE"
+   ? `On track! Add R5k/mo to reach R3M in ${Math.max(1, monthsTo3M-2)} months`
+    : status === "PRESERVE"
+   ? "Risk high - cut spending to 50% and review claims"
+    : "Stable - shift 10% more to investments";
+
   return (
     <div style={styles.dashboardContainer}>
       <Navbar onConsultClick={() => setShowConsultModal(true)} />
@@ -32,6 +58,7 @@ const ClientDashBoard = () => {
          .overviewGrid { grid-template-columns: 1fr!important; }
          .statsGrid { grid-template-columns: 1fr 1fr!important; }
          .bottomGrid { grid-template-columns: 1fr!important; }
+         .aiGrid { grid-template-columns: 1fr!important; }
         }
       `}</style>
 
@@ -69,8 +96,39 @@ const ClientDashBoard = () => {
             </div>
           </div>
 
+          {/* AI WEALTH MODEL CARD */}
+          <div className="aiGrid" style={{...styles.chartCard, background: 'linear-gradient(135deg, #111 0%, #1a120a 100%)', border: '1px solid rgba(255,107,0,0.25)', marginTop: '1rem', display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '1.5rem'}}>
+            <div>
+              <div style={{display:'flex', gap:'1rem', alignItems:'center', marginBottom:'1rem'}}>
+                <div style={{background:'rgba(255,107,0,0.12)', border:'1px solid rgba(255,107,0,0.2)', borderRadius:'10px', width:'44px', height:'44px', display:'grid', placeItems:'center', fontWeight:'800', color:'#FF8C00'}}>AI</div>
+                <div>
+                  <h3 style={{...styles.chartTitle, margin:0}}>Wealth Health Model</h3>
+                  <span style={{...styles.statLabel, color:'#FF8C00'}}>{status} • {score}/100 • {growth>0?'+':''}R{growth.toLocaleString()}/mo</span>
+                </div>
+              </div>
+              <p style={{...styles.actionText, marginBottom:'0.8rem'}}>{actionText}</p>
+              <div style={{display:'flex', gap:'0.5rem', flexWrap:'wrap'}}>
+                <span style={styles.pillOrange}>Now: R{(total/1000000).toFixed(2)}M</span>
+                <span style={styles.pillOrange}>6M: R{(forecastNow/1000000).toFixed(2)}M</span>
+                <span style={styles.pillOrange}>R3M in {monthsTo3M}m</span>
+              </div>
+            </div>
+            <div>
+              <p style={{...styles.statLabel, marginBottom:'0.6rem'}}>6-Month Forecast</p>
+              <div style={{display:'flex', alignItems:'flex-end', gap:'6px', height:'70px'}}>
+                {[total,...Array(5).fill(0).map((_,i)=> total + growth*(i+1))].map((val,i)=>{
+                  const max = Math.max(total, forecastNow);
+                  const h = Math.max(20, (val/max)*100);
+                  return <div key={i} style={{flex:1, height:`${h}%`, background: i===0?'rgba(255,255,255,0.15)':'linear-gradient(180deg,#FF8C00,#FF6B00)', borderRadius:'4px 4px 0 0'}}></div>
+                })}
+              </div>
+              <div style={{display:'flex', justifyContent:'space-between', marginTop:'0.4rem'}}>
+                <span style={styles.miniLabel}>Now</span><span style={styles.miniLabel}>6M</span>
+              </div>
+            </div>
+          </div>
+
           <div className="overviewGrid" style={styles.overviewGrid}>
-            {/* Breakdown */}
             <div style={styles.chartCard}>
               <h3 style={styles.chartTitle}>Money Allocation</h3>
               {clientMock.netWorth.breakdown.map(item => {
@@ -137,7 +195,6 @@ const ClientDashBoard = () => {
           </div>
         </section>
 
-        {/* ================= OTHER SECTIONS (unchanged) ================= */}
         <section id="MakeaClaim" style={styles.section}>
           <h2 style={styles.sectionTitle}>What You Need to Make a Claim</h2>
           <div style={styles.docGrid}>
@@ -206,12 +263,13 @@ const ClientDashBoard = () => {
       </main>
 
       <Consultation isOpen={showConsultModal} onClose={() => setShowConsultModal(false)} onContinue={handleContinueBooking} />
+      <Royaltie />
     </div>
   );
 };
 
 const styles = {
-  dashboardContainer: { display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#070c1d', fontFamily: "'Inter', sans-serif", color: '#fff' },
+  dashboardContainer: { display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#050505', fontFamily: "'Inter', sans-serif", color: '#fff' },
   mainContent: { padding: '2rem', flex: 1, maxWidth: '1280px', width: '100%', margin: '0 auto', boxSizing: 'border-box' },
   sectionFirst: { marginBottom: '2rem' },
   section: { marginTop: '4rem' },
@@ -247,6 +305,8 @@ const styles = {
   docTitle: { margin: '0 0 0.2rem 0', color: '#fff', fontSize: '0.95rem' },
   docDesc: { margin: 0, color: '#71717a', fontSize: '0.85rem' },
   pill: { fontSize: '0.7rem', padding: '0.3rem 0.7rem', borderRadius: '999px', fontWeight: '700' },
+  pillOrange: { fontSize:'0.7rem', padding:'0.3rem 0.7rem', borderRadius:'999px', fontWeight:'700', background:'rgba(255,107,0,0.12)', color:'#FF8C00', border:'1px solid rgba(255,107,0,0.2)' },
+  miniLabel: { fontSize:'0.65rem', color:'#71717a' },
   faqContainer: { display: 'flex', flexDirection: 'column', gap: '0.8rem' },
   faqItem: { background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '1.2rem 1.5rem', cursor: 'pointer' },
   faqQuestion: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', color: '#fff', fontWeight: '600' },

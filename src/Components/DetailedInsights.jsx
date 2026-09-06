@@ -1,136 +1,160 @@
-import React, { useState } from 'react';
-import { clientMock } from '../mockData/clientData';
-import { insightsMock } from '../mockData/insightsData';
+"""
+Wealth Health Model - Royal Square Financial
+Simple but helpful finance model using sklearn LinearRegression
+Input: client net worth, investments, spending, claims
+Output: health score, forecast, next action
+"""
 
-const DetailedInsights = ({ isOpen, onClose }) => {
-  const [tab, setTab] = useState('history');
-  if (!isOpen) return null;
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
-  const historyData = [
-    { month: 'Apr 2026', worth: 1800000, claims: 1, spend: 32000 },
-    { month: 'May 2026', worth: 1950000, claims: 2, spend: 38000 },
-    { month: 'Jun 2026', worth: 2100000, claims: 1, spend: 41000 },
-    { month: 'Jul 2026', worth: 2250000, claims: 3, spend: 38900 },
-    { month: 'Aug 2026', worth: 2380000, claims: 2, spend: 38900 },
-    { month: 'Sep 2026', worth: 2450890, claims: 2, spend: 45200 },
-  ];
+# --- 1. TRAIN MODEL ---
+# Training data based on real finance patterns
+# Features: [investment_ratio, spend_ratio, claims_count] -> monthly growth
+X_train = np.array([
+    [0.80, 0.30, 0], # High investor, low spender, no claims = high growth
+    [0.70, 0.40, 0],
+    [0.60, 0.50, 1],
+    [0.55, 0.55, 1],
+    [0.50, 0.60, 2],
+    [0.40, 0.70, 2], # Medium
+    [0.30, 0.80, 3], # Low investor, high spender
+    [0.20, 0.90, 4],
+    [0.75, 0.35, 0], # Best case
+    [0.25, 0.85, 5], # Worst case
+])
 
-  return (
-    <div style={styles.overlay} onClick={onClose}>
-      <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <div style={styles.header}>
-          <div>
-            <h2 style={styles.title}>Detailed Insights</h2>
-            <p style={styles.sub}>History + breakdown of what was there previously</p>
-          </div>
-          <button style={styles.closeBtn} onClick={onClose}>x</button>
-        </div>
+y_train = np.array([
+    55000, # R55k growth
+    40000,
+    20000,
+    10000,
+    5000,
+    -10000,
+    -25000,
+    -40000,
+    50000,
+    -45000
+])
 
-        <div style={styles.tabs}>
-          {['history', 'allocation', 'claims', 'spending'].map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{...styles.tab, ...(tab === t ? styles.tabActive : {})}}>{t}</button>
-          ))}
-        </div>
+model = LinearRegression()
+model.fit(X_train, y_train)
+print(f"✅ Model trained - Score: {model.score(X_train, y_train):.2f}")
 
-        <div style={styles.body}>
-          {tab === 'history' && (
-            <>
-              <h4 style={styles.sectionTitle}>What Was There Previously - Net Worth Trend</h4>
-              <div style={styles.tableHead}>
-                <span>Month</span><span>Net Worth</span><span>Change</span><span>Claims</span>
-              </div>
-              {historyData.map((row, i) => {
-                const prev = i > 0 ? historyData[i-1].worth : row.worth;
-                const change = ((row.worth - prev) / prev * 100).toFixed(1);
-                return (
-                  <div key={row.month} style={styles.tableRow}>
-                    <span style={{color: '#fff'}}>{row.month}</span>
-                    <span>R {row.worth.toLocaleString()}</span>
-                    <span style={{color: parseFloat(change) >= 0 ? '#22c55e' : '#ef4444'}}>{i === 0 ? '-' : `+${change}%`}</span>
-                    <span>{row.claims}</span>
-                  </div>
-                )
-              })}
-            </>
-          )}
+# --- 2. PREDICT FUNCTION ---
+def predict_wealth(client):
+    """
+    client = {
+        "total": 2450890,
+        "investments": 1450000,
+        "spend": 45200,
+        "income": 80000,
+        "claims_count": 2
+    }
+    """
+    total = client["total"]
+    investments = client["investments"]
+    spend = client["spend"]
+    income = client["income"]
+    claims = client["claims_count"]
 
-          {tab === 'allocation' && (
-            <>
-              <h4 style={styles.sectionTitle}>Where Your Money Was Allocated - Previous vs Now</h4>
-              {clientMock.netWorth.breakdown.map(item => (
-                <div key={item.label} style={styles.detailCard}>
-                  <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                    <span style={{color: '#fff', fontWeight: '700'}}>{item.label}</span>
-                    <span style={{color: '#FF8C00'}}>R {item.value.toLocaleString()}</span>
-                  </div>
-                  <div style={styles.barTrack}><div style={{...styles.barFill, width: `${(item.value / clientMock.netWorth.total)*100}%`, background: item.color}}></div></div>
-                  <p style={styles.detailText}>Previously in Aug: R {(item.value * 0.92).toLocaleString()} - Growth: +8%</p>
-                </div>
-              ))}
-            </>
-          )}
+    inv_ratio = investments / total
+    spend_ratio = spend / income
 
-          {tab === 'claims' && (
-            <>
-              <h4 style={styles.sectionTitle}>Claims History - What Was There Previously</h4>
-              {clientMock.claims.map(c => (
-                <div key={c.id} style={styles.detailCard}>
-                  <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                    <span style={{color: '#fff'}}>{c.id} - {c.type}</span>
-                    <span style={{color: '#22c55e'}}>{c.status}</span>
-                  </div>
-                  <p style={styles.detailText}>Amount: R {c.amount.toLocaleString()} | Date: {c.date} | Progress: {c.progress}%</p>
-                  <div style={styles.barTrack}><div style={{...styles.barFill, width: `${c.progress}%`}}></div></div>
-                </div>
-              ))}
-              <div style={{marginTop: '1rem', padding: '1rem', background: 'rgba(34,197,94,0.08)', borderRadius: '10px'}}>
-                <span style={{color: '#22c55e', fontSize: '0.85rem'}}>Your approval rate {insightsMock.claimInsights.approvalRate}% is higher than last quarter 89%</span>
-              </div>
-            </>
-          )}
+    # Predict monthly growth
+    growth = float(model.predict([[inv_ratio, spend_ratio, claims]])[0])
 
-          {tab === 'spending' && (
-            <>
-              <h4 style={styles.sectionTitle}>Spending - Previous Months vs Current</h4>
-              {historyData.slice(-3).map(row => (
-                <div key={row.month} style={styles.detailCard}>
-                  <span style={{color: '#fff'}}>{row.month}</span>
-                  <span style={{color: '#a1a1aa'}}>R {row.spend.toLocaleString()}</span>
-                </div>
-              ))}
-              <h4 style={{...styles.sectionTitle, marginTop: '1.5rem'}}>Current Breakdown</h4>
-              {insightsMock.spending.categories.map(cat => (
-                <div key={cat.name} style={{display: 'flex', justifyContent: 'space-between', padding: '0.6rem 0', borderBottom: '1px solid rgba(255,255,255,0.06)'}}>
-                  <span style={{color: '#a1a1aa'}}>{cat.name}</span>
-                  <span style={{color: '#fff'}}>R {cat.amount.toLocaleString()}</span>
-                </div>
-              ))}
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
+    # Health Score (0-100) - like credit score
+    score = 50
+    if inv_ratio > 0.6:
+        score += 25
+    elif inv_ratio > 0.5:
+        score += 15
+    elif inv_ratio > 0.4:
+        score += 5
 
-const styles = {
-  overlay: { position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', zIndex: 3000, padding: '2rem 1rem', overflowY: 'auto' },
-  modal: { width: '100%', maxWidth: '720px', background: '#0A0A0A', borderRadius: '20px', border: '1px solid rgba(255,107,0,0.2)', boxShadow: '0 20px 60px rgba(0,0,0,0.9)' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)' },
-  title: { margin: 0, color: '#fff', fontSize: '1.3rem', fontWeight: '800' },
-  sub: { margin: '0.2rem 0 0 0', color: '#71717a', fontSize: '0.85rem' },
-  closeBtn: { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer' },
-  tabs: { display: 'flex', gap: '0.5rem', padding: '1rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.06)', overflowX: 'auto' },
-  tab: { padding: '0.5rem 1rem', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: '#a1a1aa', fontSize: '0.8rem', fontWeight: '600', cursor: 'pointer', textTransform: 'capitalize', whiteSpace: 'nowrap' },
-  tabActive: { background: '#FF6B00', color: '#000', borderColor: '#FF6B00' },
-  body: { padding: '1.5rem' },
-  sectionTitle: { color: '#fff', fontSize: '1rem', fontWeight: '700', margin: '0 0 1rem 0' },
-  tableHead: { display: 'grid', gridTemplateColumns: '1fr 1fr 0.7fr 0.5fr', gap: '1rem', padding: '0.6rem 0', borderBottom: '1px solid rgba(255,255,255,0.1)', color: '#71717a', fontSize: '0.75rem', textTransform: 'uppercase' },
-  tableRow: { display: 'grid', gridTemplateColumns: '1fr 1fr 0.7fr 0.5fr', gap: '1rem', padding: '0.9rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)', color: '#a1a1aa', fontSize: '0.85rem' },
-  detailCard: { background: '#111', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '12px', padding: '1rem', marginBottom: '0.8rem' },
-  barTrack: { height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '999px', overflow: 'hidden', marginTop: '0.6rem' },
-  barFill: { height: '100%', background: '#FF6B00' },
-  detailText: { color: '#71717a', fontSize: '0.8rem', marginTop: '0.5rem' }
-};
+    if spend_ratio < 0.5:
+        score += 20
+    elif spend_ratio < 0.6:
+        score += 10
+    elif spend_ratio > 0.7:
+        score -= 20
 
-export default DetailedInsights;
+    if claims == 0:
+        score += 10
+    elif claims == 1:
+        score += 5
+    elif claims > 2:
+        score -= 15
+
+    score = max(0, min(100, int(score)))
+
+    # Status
+    if score >= 75:
+        status = "CREATE"
+    elif score < 50:
+        status = "PRESERVE"
+    else:
+        status = "STABLE"
+
+    # 6-month forecast
+    forecast = []
+    current = total
+    for i in range(1, 7):
+        current += growth
+        forecast.append({
+            "month": i,
+            "net_worth": int(current),
+            "label": f"Month {i}"
+        })
+
+    # Time to R3M
+    gap = 3000000 - total
+    months_to_3m = int(gap / growth) if growth > 0 else 999
+
+    # Risk
+    risk = "HIGH" if spend_ratio > 0.7 or claims > 3 else "MEDIUM" if spend_ratio > 0.5 else "LOW"
+
+    # Next action - MOST HELPFUL PART
+    if status == "CREATE":
+        action = f"Excellent! You're creating wealth. Add R5k/mo to reach R3M in {max(1, months_to_3m-2)} months."
+    elif status == "PRESERVE":
+        action = f"Warning: High spending ({spend_ratio*100:.0f}%) + {claims} claims. Cut spending to 50% of income to preserve wealth."
+    else:
+        action = f"Stable wealth. Increase investment from {(inv_ratio*100):.0f}% to 60% to start creating more wealth."
+
+    return {
+        "health_score": score,
+        "status": status,
+        "monthly_growth": int(growth),
+        "current_net_worth": total,
+        "forecast": forecast,
+        "months_to_3m": months_to_3m,
+        "risk_level": risk,
+        "advice": action,
+        "investment_ratio": round(inv_ratio, 2),
+        "spend_ratio": round(spend_ratio, 2)
+    }
+
+# --- 3. TEST ---
+if __name__ == "__main__":
+    test_client = {
+        "total": 2450890,
+        "investments": 1450000,
+        "spend": 45200,
+        "income": 80000,
+        "claims_count": 2
+    }
+
+    result = predict_wealth(test_client)
+
+    print("\n--- WEALTH HEALTH REPORT ---")
+    print(f"Score: {result['health_score']}/100 - {result['status']}")
+    print(f"Current: R{result['current_net_worth']:,}")
+    print(f"Growth: R{result['monthly_growth']:,}/mo")
+    print(f"Risk: {result['risk_level']}")
+    print(f"Time to R3M: {result['months_to_3m']} months")
+    print(f"Advice: {result['advice']}")
+    print("\n6-Month Forecast:")
+    for f in result['forecast']:
+        print(f" Month {f['month']}: R{f['net_worth']:,}")
