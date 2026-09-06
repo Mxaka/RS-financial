@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+.royal-root{
+    font-family: 'Inter', sans-serif;
+    background: #070c1d;
+    min-height: 100vh;
+    color: white;
+    padding: 20px;
+}
+.royal-nav{
+    display:flex; gap:24px; background:white; color:#0f172a;
+    padding:12px 20px; border-radius:4px; font-family: serif;
+    margin-bottom:12px; font-size:18px;
+}
+.royal-nav span.active{ color:#ff8a1a; font-weight:bold; }
+.royal-header{
+    background:#0d142a; border:1px solid #1e293b;
+    padding:24px; border-radius:16px;
+}
+.royal-card-orange{
+    background: linear-gradient(135deg, #ff8a1a, #ff9d2e);
+    color: white; border-radius:16px; padding:20px;
+    box-shadow: 0 10px 30px rgba(255,138,26,0.3);
+}
+.royal-card-dark{
+    background:#111a33; border:1px solid #1e2a4a;
+    border-radius:16px; padding:20px;
+}
+.royal-input{
+    width:100%; background:#0f1a36; border:1px solid #22305a;
+    border-radius:10px; padding:12px; color:white; margin-top:6px;
+}
+.royal-btn{
+    background:#ff8a1a; color:white; border:none;
+    padding:12px 20px; border-radius:10px; font-weight:700;
+    cursor:pointer; width:100%;
+}
+.royal-btn-dark{
+    background:transparent; border:1px solid #334155;
+    color:white; padding:10px 16px; border-radius:10px; cursor:pointer;
+}
+.royal-badge{ background:rgba(0,0,0,0.2); padding:4px 10px; border-radius:20px; font-size:12px; }
